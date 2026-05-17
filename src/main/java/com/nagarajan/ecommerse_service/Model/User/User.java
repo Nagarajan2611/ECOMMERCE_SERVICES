@@ -1,11 +1,13 @@
 package com.nagarajan.ecommerse_service.Model.User;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.nagarajan.ecommerse_service.Model.Cart.Cart;
+import com.nagarajan.ecommerse_service.Model.Order.Order;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,6 +17,10 @@ public class User {
     private String password;
     private String address;
     private String role;
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+    private Cart cart;
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private List<Order> order;
 
     public long getId() {
         return id;

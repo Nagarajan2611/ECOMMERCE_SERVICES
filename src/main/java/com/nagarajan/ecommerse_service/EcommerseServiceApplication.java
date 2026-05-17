@@ -8,6 +8,6 @@ public class EcommerseServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EcommerseServiceApplication.class, args);
+		System.out.println("Ecommerce_Service");
 	}
-
 }

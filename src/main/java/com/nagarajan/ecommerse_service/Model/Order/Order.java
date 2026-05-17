@@ -7,15 +7,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Table(name ="orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
     private double totalPrice;
     private String status;
-    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItems> items;
     private LocalDate date;
 
@@ -67,3 +69,4 @@ public class Order {
         this.date = date;
     }
 }
+

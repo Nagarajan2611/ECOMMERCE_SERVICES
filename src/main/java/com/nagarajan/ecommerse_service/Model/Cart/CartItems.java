@@ -1,20 +1,23 @@
 package com.nagarajan.ecommerse_service.Model.Cart;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.nagarajan.ecommerse_service.Model.Product.Product;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name ="cartsItems")
 public class CartItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @ManyToOne
     @JoinColumn(name="cart_id")
+    @JsonBackReference
     private Cart cart;
     @ManyToOne
     @JoinColumn(name="product_id")
     private Product product;
-    private long quantity;
+    private Double quantity;
 
     public long getId() {
         return id;
@@ -40,11 +43,11 @@ public class CartItems {
         this.product = product;
     }
 
-    public long getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(long quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 }

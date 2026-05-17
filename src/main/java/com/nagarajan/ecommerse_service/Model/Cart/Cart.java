@@ -1,6 +1,7 @@
 package com.nagarajan.ecommerse_service.Model.Cart;
 
-import com.nagarajan.ecommerse_service.Model.Product.Product;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nagarajan.ecommerse_service.Model.User.User;
 import jakarta.persistence.*;
 
@@ -8,13 +9,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Table(name = "carts")
 public class Cart {
     @Id
     @GeneratedValue(strategy =GenerationType.IDENTITY)
     private long id;
-    @OneToOne
+   @OneToOne
+   @JoinColumn(name = "user_id")
     private User user;
-    @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<CartItems> Items;
     private LocalDate date;
 

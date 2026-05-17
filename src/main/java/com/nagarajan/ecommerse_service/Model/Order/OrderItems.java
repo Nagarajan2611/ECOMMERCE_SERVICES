@@ -1,9 +1,11 @@
+
 package com.nagarajan.ecommerse_service.Model.Order;
 
 import com.nagarajan.ecommerse_service.Model.Product.Product;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name ="ordersItems")
 public class OrderItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
