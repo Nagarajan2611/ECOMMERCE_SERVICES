@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,18 +23,21 @@ public class UserService implements UserServeImp {
     @Autowired
     private ModelMapper mapper;
     @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
     private UserRepo repo;
     public UserResponse createUser(UserRequest request) {
         User user=mapper.map(request,User.class);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         repo.save(user);
         return mapper.map(user,UserResponse.class);
     }
     public UserResponse UpdateUser(long id, UserRequest request) {
-        User user=mapper.map(request,User.class);
+        User user=repo.findById(id).orElseThrow();
         user.setName(request.getName());
         user.setAddress(request.getAddress());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
         repo.save(user);
         return mapper.map(user,UserResponse.class);

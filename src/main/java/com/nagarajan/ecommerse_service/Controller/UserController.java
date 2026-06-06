@@ -16,11 +16,11 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService service;
-    @PostMapping
-    ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request){
-         UserResponse response=service.createUser(request);
-         return new ResponseEntity<>(response,HttpStatus.CREATED);
-    }
+//    @PostMapping
+//    ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request){
+//         UserResponse response=service.createUser(request);
+//         return new ResponseEntity<>(response,HttpStatus.CREATED);
+//    }
     @PutMapping("/id/{id}")
     ResponseEntity<UserResponse> UpdateUser(@PathVariable long id,@RequestBody UserRequest request){
         UserResponse response=service.UpdateUser(id,request);
@@ -36,7 +36,7 @@ public class UserController {
                                                   @RequestParam(required = false,defaultValue = "20") int size,
                                                   @RequestParam(required = false,defaultValue = "id") String sortby,
                                                   @RequestParam(required = false,defaultValue = "Asc") String direction,
-                                                 @RequestParam(required = false)String name,
+                                                  @RequestParam(required = false)String name,
                                                   @RequestParam(required = false)String address){
         List<UserResponse> responses=service.GetAllUser(page,size,sortby,direction,name,address);
         return new ResponseEntity<>(responses,HttpStatus.OK);
