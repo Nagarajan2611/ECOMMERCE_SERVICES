@@ -3,7 +3,9 @@ package com.nagarajan.ecommerse_service.Service;
 import com.nagarajan.ecommerse_service.Model.Order.Order;
 import com.nagarajan.ecommerse_service.Model.Order.OrderRequest;
 import com.nagarajan.ecommerse_service.Model.Order.OrderResponse;
+import com.nagarajan.ecommerse_service.Model.User.User;
 import com.nagarajan.ecommerse_service.Repo.OrderRepo;
+import com.nagarajan.ecommerse_service.Repo.UserRepo;
 import com.nagarajan.ecommerse_service.ServicesImpl.OrderServeImp;
 import com.nagarajan.ecommerse_service.Specification.OrderSpecification;
 import org.modelmapper.ModelMapper;
@@ -16,35 +18,64 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService implements OrderServeImp {
     @Autowired
     private ModelMapper mapper;
     @Autowired
-    private OrderRepo repo;
+    private OrderRepo orderRepo;
+    @Autowired
+    private UserRepo userRepo;
+    @Autowired
+    private logeddUser logeddUser;
     public OrderResponse createOrder(OrderRequest request) {
+        String username= logeddUser.loggedInUser();
+        User user=userRepo.findByName(username).orElseThrow(()->
+                          new RuntimeException("User Not Found"));
         Order order=mapper.map(request,Order.class);
+        double totalprice=0;
+        for(var item:order.getItems()){
+            double subtotal=item.getPrice()*item.getQuantity();
+            totalprice=totalprice+subtotal;
+        }
+        order.setTotalPrice(totalprice);
         order.setDate(LocalDate.now());
-        repo.save(order);
+        order.setUser(user);
+        orderRepo.save(order);
         return mapper.map(order,OrderResponse.class);
     }
     public OrderResponse UpdateOrder(long id, OrderRequest request) {
-        Order order=repo.findById(id).orElseThrow();
-        order.setTotalPrice(request.getTotalPrice());
+        if(!logeddUser.Admin()){
+            throw new RuntimeException("Only Admin can Update order");
+        }
+        Order order=orderRepo.findById(id).orElseThrow(()->
+                      new RuntimeException("Order Not found"));
+        double totalprice=0;
+        for(var item:order.getItems()){
+            double subtotal=item.getPrice()*item.getQuantity();
+            totalprice=totalprice+subtotal;
+        }
+        order.setTotalPrice(totalprice);
         order.setUser(request.getUser());
         order.setItems(request.getItems());
         order.setStatus(request.getStatus());
         order.setDate(LocalDate.now());
-        repo.save(order);
+        orderRepo.save(order);
         return mapper.map(order,OrderResponse.class);
     }
     public void DeleteOrderById(long id) {
-        repo.deleteById(id);
+        if (!logeddUser.Admin()) {
+            throw new RuntimeException("Only Admin can Delete Orders");
+        }
+        orderRepo.deleteById(id);
     }
     public List<OrderResponse> GetAllOrders(int page, int size, String sortby, String direction,
                                             Double totalprice,String status) {
+        if(!logeddUser.Admin()){
+            throw new RuntimeException("Only Admin can view Orders");
+
+        }
         Sort sort=null;
         if(!direction.equalsIgnoreCase("DESC")){
             sort=Sort.by(sortby).descending();
@@ -57,18 +88,27 @@ public class OrderService implements OrderServeImp {
         }
         PageRequest pageRequest=PageRequest.of(page-1,size,sort);
         Specification<Order> specification=new OrderSpecification(totalprice,status);
-        Page<Order> page1=repo.findAll(specification,pageRequest);
+        Page<Order> page1=orderRepo.findAll(specification,pageRequest);
         return page1.getContent()
                 .stream()
                 .map(page2->mapper.map(page2,OrderResponse.class))
                 .toList();
     }
     public OrderResponse GetOrderById(long id) {
-        Order order=repo.findById(id).orElseThrow();
+        String username= logeddUser.loggedInUser();
+        Order order=orderRepo.findById(id).orElseThrow(()->
+                        new RuntimeException("Order Not Found"));
+        if (!logeddUser.Admin()&&!order.getUser().getName().equals(username)){
+            throw new RuntimeException("Access Denied ");
+        }
         return mapper.map(order,OrderResponse.class);
     }
     public OrderResponse GetOrderByStatus(String status) {
-        Optional<Order> order=repo.findByStatus(status);
-        return null;
+        if (!logeddUser.Admin()){
+            throw new RuntimeException("Only Admin Can Search Orders");
+        }
+        Order order=orderRepo.findByStatus(status).orElseThrow(()->
+                new RuntimeException("Order Not Found"));
+        return mapper.map(order,OrderResponse.class);
     }
 }

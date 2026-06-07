@@ -26,6 +26,8 @@ public class UserService implements UserServeImp {
     PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepo repo;
+    @Autowired
+    private logeddUser logeddUser;
     public UserResponse createUser(UserRequest request) {
         User user=mapper.map(request,User.class);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -33,20 +35,29 @@ public class UserService implements UserServeImp {
         return mapper.map(user,UserResponse.class);
     }
     public UserResponse UpdateUser(long id, UserRequest request) {
-        User user=repo.findById(id).orElseThrow();
+        User user=repo.findById(id).orElseThrow(()->new RuntimeException("User Not Found"));
+        String username= logeddUser.loggedInUser();
+        if(!logeddUser.Admin()&&!user.getName().equals(username)){
+            throw new RuntimeException("Access Denied");
+        }
         user.setName(request.getName());
         user.setAddress(request.getAddress());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
         repo.save(user);
         return mapper.map(user,UserResponse.class);
     }
     public void DeleteUserById(long id) {
+        if (!logeddUser.Admin()){
+            throw new RuntimeException("Access Denied");
+        }
         repo.deleteById(id);
     }
     public List<UserResponse> GetAllUser(int page, int size, String sortby, String direction,
                                          String name,String address) {
+        if(!logeddUser.Admin()){
+            throw new RuntimeException("Access Denied");
+        }
         Sort sort=null;
         if(!direction.equalsIgnoreCase("DESC")){
             sort=Sort.by(sortby).descending();
@@ -66,11 +77,19 @@ public class UserService implements UserServeImp {
                     .toList();
     }
     public UserResponse GetByUserId(long id) {
-        User user=repo.findById(id).orElseThrow();
+        User user=repo.findById(id).orElseThrow(()->new RuntimeException("User Not Found"));
+        String username= logeddUser.loggedInUser();
+        if(!logeddUser.Admin()&&!user.getName().equals(username)){
+            throw new RuntimeException("Access Denied");
+        }
         return mapper.map(user,UserResponse.class);
     }
     public UserResponse GetByUserName(String name) {
-        Optional<User> user=repo.findByName(name);
+        User user=repo.findByName(name).orElseThrow(()->new RuntimeException("User Not Found"));
+        String username= logeddUser.loggedInUser();
+        if(!logeddUser.Admin()&&!user.equals(username)) {
+            throw new RuntimeException("Access Denied");
+        }
         return mapper.map(user,UserResponse.class);
     }
 }

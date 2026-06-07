@@ -18,8 +18,8 @@ public class CartController {
     @Autowired
     private CartService service;
     @PostMapping("/{userId}")
-    ResponseEntity<Cart> CreateCart(@PathVariable long userId){
-        Cart response=service.CreateCart(userId);
+    ResponseEntity<Cart> CreateCart(){
+        Cart response=service.CreateCart();
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
     @DeleteMapping("/id/{id}")
@@ -28,8 +28,8 @@ public class CartController {
         return new ResponseEntity<>("Deleted Cart id "+id+" successfully!"+id,HttpStatus.OK);
     }
     @GetMapping("/id/{id}")
-    ResponseEntity<CartResponse> GetCartById(@PathVariable long id){
-        CartResponse response=service.GetCartById(id);
+    ResponseEntity<List<CartResponse>> GetCartById(){
+        List<CartResponse> response=service.GetCartById();
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     @GetMapping

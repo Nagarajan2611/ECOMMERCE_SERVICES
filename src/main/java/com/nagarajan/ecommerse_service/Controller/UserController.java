@@ -16,11 +16,6 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService service;
-//    @PostMapping
-//    ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request){
-//         UserResponse response=service.createUser(request);
-//         return new ResponseEntity<>(response,HttpStatus.CREATED);
-//    }
     @PutMapping("/id/{id}")
     ResponseEntity<UserResponse> UpdateUser(@PathVariable long id,@RequestBody UserRequest request){
         UserResponse response=service.UpdateUser(id,request);

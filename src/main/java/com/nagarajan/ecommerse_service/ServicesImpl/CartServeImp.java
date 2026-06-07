@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 @Component
 public interface CartServeImp {
-    Cart CreateCart(long userId);
+    Cart CreateCart();
     void DeleteCartById(long id);
-    CartResponse GetCartById(long id);
+    List<CartResponse> GetCartById();
     List<CartResponse> GetAllCart();
     CartItems addproduct(CartItemsRequest request);
     CartItems UpdateCartitems(long id, CartItemsRequest request);

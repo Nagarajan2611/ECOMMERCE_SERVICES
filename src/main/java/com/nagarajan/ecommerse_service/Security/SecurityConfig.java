@@ -21,35 +21,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http)  throws Exception{
+          http
+          .csrf(csrf->csrf.disable())
+          .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+          .authorizeHttpRequests(auth->
+               auth.requestMatchers("/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/user").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.PUT,"/user/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,"/user/**").hasRole("ADMIN")
 
-              http
-                    .csrf(csrf->csrf.disable())
-                    .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authorizeHttpRequests(auth->
-                            auth.requestMatchers("/auth/**").permitAll()
-                                    .requestMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.POST,"/user/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.PUT,"/user/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.DELETE,"/user/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET,"/product/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.POST,"/product/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,"/product/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,"/product/**").hasRole("ADMIN")
 
-                                    .requestMatchers(HttpMethod.GET,"/product/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.POST,"/product/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.PUT,"/product/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.DELETE,"/product/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET,"/cart/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.POST,"/cart/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.PUT,"/cart/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.DELETE,"/cart/**").hasAnyRole("USER","ADMIN")
 
-                                    .requestMatchers(HttpMethod.GET,"/cart/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.POST,"/cart/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.PUT,"/cart/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.DELETE,"/cart/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.GET,"/order/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.POST,"/order/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.PUT,"/order/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,"/order/**").hasRole("ADMIN")
 
-                                    .requestMatchers(HttpMethod.GET,"/order/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.POST,"/order/**").hasAnyRole("USER","ADMIN")
-                                    .requestMatchers(HttpMethod.PUT,"/order/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.DELETE,"/order/**").hasRole("ADMIN")
-
-                                    .anyRequest().authenticated())
-                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-            return http. build();
+                .anyRequest().authenticated())
+          .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+          return http. build();
         }
 
         @Bean
