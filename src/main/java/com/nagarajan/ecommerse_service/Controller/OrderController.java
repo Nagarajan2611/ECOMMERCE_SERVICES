@@ -3,6 +3,7 @@ package com.nagarajan.ecommerse_service.Controller;
 import com.nagarajan.ecommerse_service.Model.Order.Order;
 import com.nagarajan.ecommerse_service.Model.Order.OrderRequest;
 import com.nagarajan.ecommerse_service.Model.Order.OrderResponse;
+import com.nagarajan.ecommerse_service.Model.Order.StatusRequest;
 import com.nagarajan.ecommerse_service.Service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,11 @@ public class OrderController {
     @PostMapping
     ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request){
         OrderResponse response=service.createOrder(request);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
+    @PostMapping("/status/{id}")
+    ResponseEntity<OrderResponse> updateStatus(@PathVariable long id, @RequestBody StatusRequest request){
+        OrderResponse response= service.updateStatus(id,request);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
     @PutMapping("/id/{id}")

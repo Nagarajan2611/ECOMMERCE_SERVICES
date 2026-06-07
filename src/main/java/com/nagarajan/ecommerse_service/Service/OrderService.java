@@ -3,6 +3,7 @@ package com.nagarajan.ecommerse_service.Service;
 import com.nagarajan.ecommerse_service.Model.Order.Order;
 import com.nagarajan.ecommerse_service.Model.Order.OrderRequest;
 import com.nagarajan.ecommerse_service.Model.Order.OrderResponse;
+import com.nagarajan.ecommerse_service.Model.Order.StatusRequest;
 import com.nagarajan.ecommerse_service.Model.User.User;
 import com.nagarajan.ecommerse_service.Repo.OrderRepo;
 import com.nagarajan.ecommerse_service.Repo.UserRepo;
@@ -39,6 +40,7 @@ public class OrderService implements OrderServeImp {
             double subtotal=item.getPrice()*item.getQuantity();
             totalprice=totalprice+subtotal;
         }
+        order.setStatus("PLACED");
         order.setTotalPrice(totalprice);
         order.setDate(LocalDate.now());
         order.setUser(user);
@@ -57,9 +59,8 @@ public class OrderService implements OrderServeImp {
             totalprice=totalprice+subtotal;
         }
         order.setTotalPrice(totalprice);
-        order.setUser(request.getUser());
         order.setItems(request.getItems());
-        order.setStatus(request.getStatus());
+        order.setStatus("PLACED");
         order.setDate(LocalDate.now());
         orderRepo.save(order);
         return mapper.map(order,OrderResponse.class);
@@ -111,4 +112,14 @@ public class OrderService implements OrderServeImp {
                 new RuntimeException("Order Not Found"));
         return mapper.map(order,OrderResponse.class);
     }
+
+    public OrderResponse updateStatus(long id, StatusRequest request){
+        Order order=orderRepo.findById(id).orElseThrow(()->
+                new RuntimeException("order Not Found"));
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+        return mapper.map(order,OrderResponse.class);
+    }
 }
+
+

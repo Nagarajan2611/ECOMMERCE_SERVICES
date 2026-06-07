@@ -26,6 +26,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
           .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
           .authorizeHttpRequests(auth->
                auth.requestMatchers("/auth/**").permitAll()
+
+                       .requestMatchers("/","/index.html","/style.css").permitAll()
+                       .requestMatchers("/swagger-ui/**",
+                               "/v3/api-docs/**",
+                               "/swagger-ui.html"
+                       ).permitAll()
+
                 .requestMatchers(HttpMethod.GET,"/user").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")
                 .requestMatchers(HttpMethod.PUT,"/user/**").hasRole("ADMIN")

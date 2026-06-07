@@ -17,7 +17,7 @@ import java.util.List;
 public class CartController {
     @Autowired
     private CartService service;
-    @PostMapping("/{userId}")
+    @PostMapping
     ResponseEntity<Cart> CreateCart(){
         Cart response=service.CreateCart();
         return new ResponseEntity<>(response,HttpStatus.CREATED);
